@@ -7,13 +7,19 @@ using System.Linq;
 
 namespace ConsoleFinDesFilms
 {
-    internal static class UpdateAllMoviesProcess
+    public class UpdateAllMoviesProcess : IUpdateAllMoviesProcess
     {
         private const int NUMBER_OF_LINES_TO_CHECK = 6000000;
         private const int NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME = 200;
         private const int NUMBER_OF_ENTRY_TO_ADD_IN_ONE_TIME = 2000;
+        private readonly FilmContext Context;
 
-        internal static void RunProcess()
+        public UpdateAllMoviesProcess(FilmContext context)
+        {
+            Context = context;
+        }
+
+        public void RunProcess()
         {
             Console.WriteLine("NUMBER_OF_LINES_TO_CHECK:" + NUMBER_OF_LINES_TO_CHECK);
             Console.WriteLine("NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME:" + NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME);
@@ -26,25 +32,23 @@ namespace ConsoleFinDesFilms
             CheckAndAddOrUpdateMoviesInContext(listOfMoviesUnexistingOrIncompleteInDb, listIdUncompleteExistingMovies);
         }
 
-        private static List<string> GetCompleteExistingMoviesInDb()
+        private List<string> GetCompleteExistingMoviesInDb()
         {
-            using FilmContext context = new FilmContext();
             Console.WriteLine($"Finding complete movies in db...");
-            List<string> listIdFullExistingMovies = context.Films.Where(m => !string.IsNullOrWhiteSpace(m.Name)).Select(x => x.Id).ToList();
+            List<string> listIdFullExistingMovies = Context.Films.Where(m => !string.IsNullOrWhiteSpace(m.Name)).Select(x => x.Id).ToList();
             Console.WriteLine($"Found {listIdFullExistingMovies.Count} complete movies in db");
             return listIdFullExistingMovies;
         }
 
-        private static List<string> GetUncompleteExistingMoviesInDb()
+        private List<string> GetUncompleteExistingMoviesInDb()
         {
-            using FilmContext context = new FilmContext();
             Console.WriteLine($"Finding uncomplete movies in db...");
-            var listIdsExistingInDb = context.Films.Where(m => string.IsNullOrWhiteSpace(m.Name)).Select(m => m.Id).ToList();
+            var listIdsExistingInDb = Context.Films.Where(m => string.IsNullOrWhiteSpace(m.Name)).Select(m => m.Id).ToList();
             Console.WriteLine($"Found {listIdsExistingInDb.Count} uncomplete movies in db");
             return listIdsExistingInDb;
         }
 
-        private static List<Film> FindUnexistingMoviesInBasicFile(string pathListFilms, List<string> listIdFullExistingMovies)
+        private List<Film> FindUnexistingMoviesInBasicFile(string pathListFilms, List<string> listIdFullExistingMovies)
         {
             Console.WriteLine("Starting check in basic file at : " + DateTime.Now.ToString("t"));
             var listOfMoviesUnexistingInDb = new List<Film>();
@@ -175,39 +179,38 @@ namespace ConsoleFinDesFilms
             return chosenTitle.Title;
         }
 
-        private static void CheckAndAddOrUpdateMoviesInContext(List<Film> listFilms, List<string> listIdUncompleteExistingMovies)
+        private void CheckAndAddOrUpdateMoviesInContext(List<Film> listFilms, List<string> listIdUncompleteExistingMovies)
         {
             Console.WriteLine("Saving in database at : " + DateTime.Now.ToString("t"));
             int totalToAdd = 0;
             int totalToUpdate = 0;
-            using FilmContext context = new FilmContext();
             foreach (Film filmDTO in listFilms)
             {
                 if (!listIdUncompleteExistingMovies.Any(id => id == filmDTO.Id))
                 {
-                    context.Films.Add(filmDTO);
+                    Context.Films.Add(filmDTO);
                     totalToAdd++;
                     if (totalToAdd % NUMBER_OF_ENTRY_TO_ADD_IN_ONE_TIME == 0)
                     {
                         Console.WriteLine($"Adding entries...");
-                        context.SaveChanges();
+                        Context.SaveChanges();
                         Console.WriteLine($"Added a total of : {totalToAdd}");
                     }
                 }
                 else
                 {
-                    context.Films.Update(filmDTO);
+                    Context.Films.Update(filmDTO);
                     totalToUpdate++;
                     if (totalToUpdate % NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME == 0)
                     {
                         Console.WriteLine($"Updating entries...");
-                        context.SaveChanges();
+                        Context.SaveChanges();
                         Console.WriteLine($"Updated a total of : {totalToUpdate}");
                     }
                 }
             }
             Console.WriteLine($"Adding/Updating entries...");
-            context.SaveChanges();
+            Context.SaveChanges();
             Console.WriteLine($"Added a total of : {totalToAdd}");
             Console.WriteLine($"Updated a total of : {totalToUpdate}");
         }

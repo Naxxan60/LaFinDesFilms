@@ -1,6 +1,8 @@
-﻿using System;
-using ConsoLovers.ConsoleToolkit.Contracts;
-using ConsoLovers.ConsoleToolkit.Menu;
+﻿using DataAccess;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace ConsoleFinDesFilms
 {
@@ -8,40 +10,32 @@ namespace ConsoleFinDesFilms
     {
         static void Main()
         {
-            Console.Title = "La Fin Des Films - Console";
+            // Create service collection and configure our services
+            var services = ConfigureServices();
+            // Generate a provider
+            var serviceProvider = services.BuildServiceProvider();
 
-            Console.CursorSize = 4;
-            Console.WindowHeight = 40;
-            Console.WindowWidth = 120;
-            string header = @"
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-██ ████ ▄▄▀█████ ▄▄▄█▄██ ▄▄▀█████ ▄▄▀█ ▄▄█ ▄▄█████ ▄▄▄█▄██ ██ ▄▀▄ █ ▄▄██████ ▄▄▀█▀▄▄▀█ ▄▄▀█ ▄▄█▀▄▄▀█ ██ ▄▄██
-██ ████ ▀▀ █████ ▄▄██ ▄█ ██ █████ ██ █ ▄▄█▄▄▀█████ ▄▄██ ▄█ ██ █▄█ █▄▄▀██▄▄██ ████ ██ █ ██ █▄▄▀█ ██ █ ██ ▄▄██
-██ ▀▀ █▄██▄█████ ███▄▄▄█▄██▄█████ ▀▀ █▄▄▄█▄▄▄█████ ███▄▄▄█▄▄█▄███▄█▄▄▄██████ ▀▀▄██▄▄██▄██▄█▄▄▄██▄▄██▄▄█▄▄▄██
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀";
-            string footer = Environment.NewLine + "";
-
-            ColoredConsoleMenu menu = new ColoredConsoleMenu { Header = header, Footer = footer, CircularSelection = false, Selector = "» " };
-            menu.SelectionStrech = SelectionStrech.UnifiedLength;
-            menu.IndexMenuItems = false;
-            menu.Add(new ConsoleMenuItem("Update all movies", UpdateAllMoviesRunProcess));
-            menu.Add(new ConsoleMenuItem("Update top rated movies", UpdateTopRatedMoviesRunProcess));
-            menu.Add(new ConsoleMenuItem("Close menu", x => menu.Close()));
-            menu.Show();
+            // Kick off our actual code
+            serviceProvider.GetService<ConsoleApplication>().Run();
         }
 
-        private static void UpdateAllMoviesRunProcess(ConsoleMenuItem sender)
+        private static IServiceCollection ConfigureServices()
         {
-            UpdateAllMoviesProcess.RunProcess();
-            Console.WriteLine("Done. Press any key to return to the menu...");
-            Console.ReadLine();
+            IServiceCollection services = new ServiceCollection();
+            IConfiguration config = LoadConfiguration();
+            services.AddSingleton(config);
+            services.AddTransient<IUpdateAllMoviesProcess, UpdateAllMoviesProcess>();
+            services.AddTransient<IUpdateTopRatedMoviesProcess, UpdateTopRatedMoviesProcess>();
+            services.AddDbContext<FilmContext>(opts => opts.UseSqlServer(config.GetConnectionString("FinDesFilmsDatabase")));
+            services.AddTransient<ConsoleApplication>();
+            return services;
         }
-
-        private static void UpdateTopRatedMoviesRunProcess(ConsoleMenuItem sender)
+        public static IConfiguration LoadConfiguration()
         {
-            UpdateTopRatedMoviesProcess.RunProcess();
-            Console.WriteLine("Done. Press any key to return to the menu...");
-            Console.ReadLine();
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            return builder.Build();
         }
     }
 }

@@ -15,6 +15,7 @@ namespace LaFinDesFilms.Pages
 
         public void OnGet()
         {
+            _logger.LogInformation("test");
         }
     }
 }

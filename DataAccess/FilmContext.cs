@@ -1,24 +1,24 @@
 ﻿using DTO;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Configuration;
 using System.Linq;
 
 namespace DataAccess
 {
     public class FilmContext : DbContext
     {
-        public FilmContext()
+        public DbSet<Film> Films { get; set; }
+        public DbSet<TopRatedMovie> TopRatedMovies { get; set; }
+
+        public FilmContext(DbContextOptions<FilmContext> options) : base(options)
         {
             //this.Database.SetCommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds);
         }
 
-        public DbSet<Film> Films { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["LaFinDesFilmsAzureDb"].ConnectionString);
         }
+
         public override int SaveChanges()
         {
             var entries = ChangeTracker
