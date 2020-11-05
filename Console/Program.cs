@@ -26,6 +26,7 @@ namespace ConsoleFinDesFilms
             services.AddSingleton(config);
             services.AddTransient<IUpdateAllMoviesProcess, UpdateAllMoviesProcess>();
             services.AddTransient<IUpdateTopRatedMoviesProcess, UpdateTopRatedMoviesProcess>();
+            services.AddTransient<IUpdateNamesInTopRatedMoviesProcess, UpdateNamesInTopRatedMoviesProcess>();
             services.AddDbContext<FilmContext>(opts => opts.UseSqlServer(config.GetConnectionString("FinDesFilmsDatabase")));
             services.AddTransient<ConsoleApplication>();
             return services;
