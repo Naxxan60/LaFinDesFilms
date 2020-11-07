@@ -12,7 +12,7 @@ var Nightly = new Nightly(nightModeConfig, true); // To disable persistence, set
 if (Nightly.isDark) {
     toggleDarkTheme();
 } else {
-
+    $("#switch_theme").prop('checked', true);
     toggleLightTheme();
 }
 
