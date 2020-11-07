@@ -1,0 +1,18 @@
+﻿@page "{id}"
+@model LaFinDesFilms.Pages.MovieModel
+<h3>
+    RouteData.Values["title"] : @RouteData.Values["id"]
+</h3>
+<h2>Model.Title : @Model.Id</h2>
+<h2>Model.Title : @Model.TopRatedMovie.Name</h2>
+<h2>Model.Title : @Model.TopRatedMovie.NbVote</h2>
+<h2>Model.Title : @Model.TopRatedMovie.CreatedDate</h2>
+<h2>Model.Title : @Model.TopRatedMovie.UpdatedDate</h2>
+<p>Omdb api info :</p>
+<p>@Model.OmdbMovieInfo.Title</p>
+<p>@Model.OmdbMovieInfo.Director</p>
+<p>@Model.OmdbMovieInfo.Actors</p>
+<p>@Model.OmdbMovieInfo.Country</p>
+<img src="@Model.OmdbMovieInfo.Poster" />
+<p><a href="/movie/tt7458762" class="btn btn-default">Le Chant du Loup</a></p>
+<p><a href="/movie/tt3896198" class="btn btn-default">Guardians of the Galaxy Vol. 2</a></p>

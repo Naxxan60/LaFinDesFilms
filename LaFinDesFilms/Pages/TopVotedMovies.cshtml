@@ -1,0 +1,39 @@
+﻿@page
+@model LaFinDesFilms.Pages.TopVotedMoviesModel
+@{
+    ViewData["Title"] = "Films les plus votés";
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>NbVote</th>
+                <th>CreatedDate</th>
+                <th>UpdatedDate</th>
+            </tr>
+            @foreach (var item in Model.TopRatedMovies)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NbVote)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UpdatedDate)
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
