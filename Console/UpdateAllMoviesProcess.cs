@@ -125,7 +125,7 @@ namespace ConsoleFinDesFilms
                     if (!string.IsNullOrEmpty(previousId) && currentId != previousId)
                     {
                         chosenTitle = FindTheFrenchTitle(listTitleOfAMovie);
-                        listOfMoviesUnexistingOrIncompleteInDb.Find(m => m.Id == currentId).Name = chosenTitle;
+                        listOfMoviesUnexistingOrIncompleteInDb.Find(m => m.Id == previousId).Name = chosenTitle;
                         listTitleOfAMovie.Clear();
                         numberOfTitlesChecked++;
                     }
@@ -145,7 +145,7 @@ namespace ConsoleFinDesFilms
                 {
                     // One last time
                     chosenTitle = FindTheFrenchTitle(listTitleOfAMovie);
-                    listOfMoviesUnexistingOrIncompleteInDb.Find(m => m.Id == currentId).Name = chosenTitle;
+                    listOfMoviesUnexistingOrIncompleteInDb.Find(m => m.Id == previousId).Name = chosenTitle;
                 }
             }
             Console.WriteLine("Checked titles : " + numberOfTitlesChecked);

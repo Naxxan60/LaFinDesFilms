@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DataAccess
 {
@@ -21,6 +23,30 @@ namespace DataAccess
 
         public override int SaveChanges()
         {
+            SetCreatedDateOrAndUpdatedDate();
+            return base.SaveChanges();
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            SetCreatedDateOrAndUpdatedDate();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            SetCreatedDateOrAndUpdatedDate();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            SetCreatedDateOrAndUpdatedDate();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        public void SetCreatedDateOrAndUpdatedDate()
+        {
             var entries = ChangeTracker
                 .Entries()
                 .Where(e => e.Entity is BaseEntity && (
@@ -36,8 +62,6 @@ namespace DataAccess
                     ((BaseEntity)entityEntry.Entity).CreatedDate = DateTime.Now;
                 }
             }
-
-            return base.SaveChanges();
         }
     }
 }

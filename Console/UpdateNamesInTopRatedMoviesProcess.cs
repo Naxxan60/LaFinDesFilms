@@ -10,9 +10,9 @@ namespace ConsoleFinDesFilms
 {
     public class UpdateNamesInTopRatedMoviesProcess : IUpdateNamesInTopRatedMoviesProcess
     {
-        private const int NUMBER_OF_LINES_TO_CHECK = 20000000;
-        private const int START_AT_LINE = 2500000;
-        private const int NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME = 200;
+        private const int NUMBER_OF_LINES_TO_CHECK = 25000000;
+        private const int START_AT_LINE = 21600000;
+        private const int NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME = 400;
         private readonly FilmContext Context;
         private List<Task> savingTasks = new List<Task>();
         private int NumberOfTitlesChecked = 0;
@@ -26,6 +26,7 @@ namespace ConsoleFinDesFilms
         public void RunProcess()
         {
             Console.WriteLine("NUMBER_OF_LINES_TO_CHECK:" + NUMBER_OF_LINES_TO_CHECK);
+            Console.WriteLine("START_AT_LINE:" + START_AT_LINE);
             Console.WriteLine("NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME:" + NUMBER_OF_ENTRY_TO_UPDATE_IN_ONE_TIME);
             Console.WriteLine("Started at : " + DateTime.Now.ToString("t"));
             var listExistingMovies = GetExistingTopRatedMoviesInDb();
@@ -83,7 +84,7 @@ namespace ConsoleFinDesFilms
                     if (!string.IsNullOrEmpty(previousId) && currentId != previousId)
                     {
                         chosenTitle = FindTheFrenchTitle(listTitleOfAMovie);
-                        var film = listExistingMovies.Find(m => m.Id == currentId);
+                        var film = listExistingMovies.Find(m => m.Id == previousId);
                         film.Name = chosenTitle;
                         listMoviesToUpdate.Add(film);
                         if (CheckAndSaveInDatabaseEachXMovies(listMoviesToUpdate, ref totalToUpdate))
@@ -109,10 +110,11 @@ namespace ConsoleFinDesFilms
                 {
                     // One last time
                     chosenTitle = FindTheFrenchTitle(listTitleOfAMovie);
-                    var film = listExistingMovies.Find(m => m.Id == currentId);
+                    var film = listExistingMovies.Find(m => m.Id == previousId);
                     film.Name = chosenTitle;
                     listMoviesToUpdate.Add(film);
-                    CheckAndSaveInDatabaseEachXMovies(listMoviesToUpdate, ref totalToUpdate);
+                    savingTasks.Add(SaveInDatabaseMoviesSync(listMoviesToUpdate, totalToUpdate));
+                    Task.WaitAll(savingTasks.ToArray());
                     NumberOfTitlesChecked++;
                 }
             }
