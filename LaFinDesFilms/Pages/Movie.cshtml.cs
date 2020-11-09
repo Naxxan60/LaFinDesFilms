@@ -30,12 +30,11 @@ namespace LaFinDesFilms.Pages
         public async Task OnGetAsync(string id)
         {
             Id = id;
-            TopRatedMovie = _topRatedMoviesService.GetTopRatedMovie(id);
+            TopRatedMovie = _topRatedMoviesService.GetTopRatedMovieById(id);
 
             string requestedUrl = $"http://www.omdbapi.com/?i={Id}&apikey=67111ede";
             var request = new HttpRequestMessage(HttpMethod.Get, requestedUrl);
-            request.Headers.Add("Accept", "application/vnd.github.v3+json");
-            request.Headers.Add("User-Agent", "LaFinDesFilms");
+            request.Headers.Add("Accept", "application/json");
 
             var client = _clientFactory.CreateClient();
 

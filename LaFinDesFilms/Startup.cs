@@ -1,4 +1,5 @@
 using DataAccess;
+using DTO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -23,7 +24,9 @@ namespace LaFinDesFilms
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
+            services.AddScoped<ITopRatedMoviesRepo, TopRatedMoviesRepo>();
             services.AddScoped<ITopRatedMoviesService, TopRatedMoviesService>();
+            services.AddScoped<ICacheManagerService, CacheManagerService>();
             services.AddDbContext<FilmContext>(options => options.UseSqlServer(Configuration.GetConnectionString("FinDesFilmsDatabase")));
             services.AddRazorPages();
         }

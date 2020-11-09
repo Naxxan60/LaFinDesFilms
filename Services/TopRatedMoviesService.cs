@@ -1,27 +1,39 @@
-﻿using DataAccess;
-using DTO;
+﻿using DTO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Services
 {
     public class TopRatedMoviesService : ITopRatedMoviesService
     {
-        private  FilmContext context { get; set; }
+        private readonly ITopRatedMoviesRepo _topRatedMoviesRepo;
+        private readonly ICacheManagerService _cacheManagerService;
 
-        public TopRatedMoviesService(FilmContext _context)
+        public TopRatedMoviesService(ICacheManagerService cacheManagerService, ITopRatedMoviesRepo topRatedMoviesRepo)
         {
-            this.context = _context;
+            _cacheManagerService = cacheManagerService;
+            _topRatedMoviesRepo = topRatedMoviesRepo;
         }
 
-        public IEnumerable<TopRatedMovie> GetTopRatedMovies()
+        public async Task<List<TopRatedMovie>> GetTopRatedMoviesAsync(int numberOfEntriesToGet = 0)
         {
-            return context.TopRatedMovies.OrderByDescending(m => m.NbVote).Take(10);
+            var list = await _cacheManagerService.GetTopRatedMoviesFromCacheAsync();
+            if (numberOfEntriesToGet == 0)
+            {
+                return list;
+            }
+            else
+            {
+                return list.Take(numberOfEntriesToGet).ToList();
+            }
         }
 
-        public TopRatedMovie GetTopRatedMovie(string id)
+        public TopRatedMovie GetTopRatedMovieById(string id)
         {
-            return context.TopRatedMovies.Find(id);
+            return _cacheManagerService.TryGetTopRatedMoviesFromCache(out var cacheEntry)
+                ? cacheEntry.Find(m => m.Id == id)
+                : _topRatedMoviesRepo.GetTopRatedMovieById(id);
         }
     }
 }

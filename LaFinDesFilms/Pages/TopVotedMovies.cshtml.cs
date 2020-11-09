@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ namespace LaFinDesFilms.Pages
 {
     public class TopVotedMoviesModel : PageModel
     {
-        public List<TopRatedMovie> TopRatedMovies { get; set; }
+        public IEnumerable<TopRatedMovie> TopRatedMovies { get; set; }
         public ITopRatedMoviesService topRatedMoviesService { get; set; }
 
         public TopVotedMoviesModel(ITopRatedMoviesService _topRatedMoviesService)
@@ -19,10 +18,9 @@ namespace LaFinDesFilms.Pages
             topRatedMoviesService = _topRatedMoviesService;
         }
 
-        [HttpGet("{id}")]
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
-            TopRatedMovies = topRatedMoviesService.GetTopRatedMovies().ToList();
+            TopRatedMovies = await topRatedMoviesService.GetTopRatedMoviesAsync(10);
             return Page();
         }
     }
