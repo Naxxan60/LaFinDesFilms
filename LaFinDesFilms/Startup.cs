@@ -25,6 +25,7 @@ namespace LaFinDesFilms
         {
             services.AddHttpClient();
             services.AddScoped<ITopRatedMoviesRepo, TopRatedMoviesRepo>();
+            services.AddScoped<IOmdbApiService, OmdbApiService>();
             services.AddScoped<ITopRatedMoviesService, TopRatedMoviesService>();
             services.AddScoped<ICacheManagerService, CacheManagerService>();
             services.AddDbContext<FilmContext>(options => options.UseSqlServer(Configuration.GetConnectionString("FinDesFilmsDatabase")));

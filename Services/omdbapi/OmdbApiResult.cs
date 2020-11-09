@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LaFinDesFilms.omdbapi
+namespace Services
 {
     public class OmdbApiRating
     {
